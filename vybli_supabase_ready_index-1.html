@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VYBLI v2</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#08090e;color:#fff;font-family:Inter,system-ui,Arial}
+.app{max-width:520px;margin:auto;min-height:100vh;background:linear-gradient(180deg,#111522,#08090e)}
+header{padding:18px;position:sticky;top:0;z-index:5;background:#0b0d14ee;backdrop-filter:blur(18px);border-bottom:1px solid #252936}
+.logo{font-size:29px;font-weight:900}.logo span{color:#8b5cf6}.muted{color:#969aaa;font-size:13px}
+main{padding:16px 16px 100px}.page{display:none}.page.active{display:block}
+.card{background:#151821;border:1px solid #292d3a;border-radius:20px;padding:17px;margin:12px 0}
+.hero{padding:22px;border-radius:24px;background:radial-gradient(circle at top right,#34205e,#171925 55%,#101117);border:1px solid #303343}
+h1,h2,h3{margin:0 0 7px}.hero h1{font-size:31px;line-height:1.05}
+input{width:100%;padding:13px;border-radius:13px;border:1px solid #303442;background:#0e1017;color:#fff;outline:none;margin:6px 0}
+button{border:0;border-radius:13px;padding:12px 15px;background:#8b5cf6;color:#fff;font-weight:800;cursor:pointer}.full{width:100%;margin-top:8px}
+.row{display:flex;align-items:center;gap:11px}.avatar{width:45px;height:45px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#8b5cf6,#ec4899);font-weight:900}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:13px}.tile{padding:15px;border:1px solid #292d39;border-radius:18px;background:#151720;cursor:pointer}
+.tile b{display:block;margin:7px 0}
+.chat{height:330px;overflow:auto;background:#0d0f15;border-radius:16px;padding:12px;margin-top:12px}
+.msg{max-width:78%;background:#20232f;padding:10px 12px;border-radius:15px;margin:8px 0;font-size:13px}.mine{margin-left:auto;background:#7044d8}
+.composer{display:flex;gap:7px;margin-top:9px}.composer input{margin:0}.composer button{min-width:65px}
+.truth{margin-top:14px;text-align:center;padding:23px;border:1px solid #292d39;border-radius:20px;background:#151720}
+.question{min-height:90px;display:grid;place-items:center;font-size:20px;font-weight:800}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);height:73px;background:#0b0d14f2;backdrop-filter:blur(18px);display:grid;grid-template-columns:repeat(5,1fr);z-index:20;border-top:1px solid #252936}
+.nav button{background:none;color:#777d8f;font-size:10px;padding:7px 1px}.nav button.active{color:#fff}.ico{display:block;font-size:20px;margin-bottom:3px}
+.status{margin-top:9px;font-size:12px}.ok{color:#54e39a}.err{color:#ff718d}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="logo">VYB<span>LI</span> ✦</div><div class="muted">Connect • Play • Discover</div></header>
+<main>
+
+<section id="auth" class="page active">
+<div class="hero"><h1>Welcome to VYBLI</h1><p class="muted">Create your account and enter the social playground.</p></div>
+<div class="card">
+<h3 id="authTitle">Create account</h3>
+<input id="email" type="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+<button id="authBtn" class="full" onclick="auth()">Sign up</button>
+<button id="switchBtn" class="full" style="background:#242735" onclick="toggleAuth()">Already have an account? Login</button>
+<div id="authStatus" class="status muted"></div>
+</div>
+</section>
+
+<section id="home" class="page">
+<div class="hero"><h1>Your people.<br>Your vibe.</h1><p class="muted">Chat, communities, games and daily challenges in one place.</p></div>
+<div class="grid">
+<div class="tile" onclick="show('chat')">💬<b>Private Chat</b><span class="muted">Realtime messages</span></div>
+<div class="tile" onclick="show('groups')">👥<b>Communities</b><span class="muted">Join your people</span></div>
+<div class="tile" onclick="show('play')">🎮<b>Play Zone</b><span class="muted">Quick games</span></div>
+<div class="tile" onclick="show('truth')">🔥<b>Truth & Dare</b><span class="muted">Challenges</span></div>
+</div>
+<div class="card row"><div class="avatar" id="myAvatar">V</div><div><h3 id="welcome">Welcome!</h3><span class="muted" id="userEmail"></span></div></div>
+<button class="full" onclick="logout()">Log out</button>
+</section>
+
+<section id="chat" class="page">
+<h2>💬 Community Chat</h2><p class="muted">Realtime messages with Supabase.</p>
+<div id="chatbox" class="chat"><div class="msg">Welcome to VYBLI 👋</div></div>
+<div class="composer"><input id="message" placeholder="Write a message..." onkeydown="if(event.key==='Enter')sendMessage()"><button onclick="sendMessage()">Send</button></div>
+</section>
+
+<section id="groups" class="page">
+<h2>👥 Communities</h2><p class="muted">Telegram-style groups for VYBLI.</p>
+<div class="card"><h3>🔥 Daily Vibes</h3><p class="muted">12.4K members • memes & chat</p><button onclick="join('Daily Vibes')">Join</button></div>
+<div class="card"><h3>🎬 Anime Hub</h3><p class="muted">8.7K members • edits & theories</p><button onclick="join('Anime Hub')">Join</button></div>
+<div class="card"><h3>🎮 Gaming Zone</h3><p class="muted">5.2K members • challenges</p><button onclick="join('Gaming Zone')">Join</button></div>
+</section>
+
+<section id="play" class="page">
+<h2>🎮 Play Zone</h2><p class="muted">Quick games and challenges.</p>
+<div class="grid">
+<div class="tile" onclick="truth()">❓<b>Truth</b><span class="muted">Random question</span></div>
+<div class="tile" onclick="dare()">🔥<b>Dare</b><span class="muted">Safe challenge</span></div>
+<div class="tile" onclick="wyr()">🎯<b>Would You Rather</b><span class="muted">Pick one</span></div>
+<div class="tile" onclick="quiz()">🧠<b>Quick Quiz</b><span class="muted">Test yourself</span></div>
+</div>
+<div class="truth"><div id="question" class="question">Choose a game</div></div>
+</section>
+
+<section id="truth" class="page">
+<h2>🔥 Truth & Dare</h2>
+<div class="truth"><div id="tdq" class="question">Tap a button</div>
+<button onclick="truth()">Truth</button> <button onclick="dare()">Dare</button></div>
+</section>
+
+</main>
+
+<nav id="nav" class="nav" style="display:none">
+<button class="active" onclick="show('home',this)"><span class="ico">⌂</span>Home</button>
+<button onclick="show('chat',this)"><span class="ico">◉</span>Chat</button>
+<button onclick="show('groups',this)"><span class="ico">♟</span>Groups</button>
+<button onclick="show('play',this)"><span class="ico">🎮</span>Play</button>
+<button onclick="show('truth',this)"><span class="ico">🔥</span>Truth</button>
+</nav>
+</div>
+
+<script>
+/* ===== SUPABASE: ONLY CHANGE THESE TWO LINES ===== */
+const SUPABASE_URL = "https://ufoovhdaxzcejurwdfyp.supabase.co";
+const SUPABASE_KEY = "sb_publishable_b7uQPy3nu7C8vpTx8djN7Q_oX8JLi8h";
+/* ================================================= */
+
+let sb=null,currentUser=null,loginMode=false;
+
+if(!SUPABASE_URL.includes("PASTE_")&&!SUPABASE_KEY.includes("PASTE_")){
+  sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+  sb.auth.onAuthStateChange((_e,session)=>{
+    currentUser=session?.user||null;
+    currentUser?enterApp():showAuth();
+  });
+}else{
+  setAuth("Paste your Supabase URL and Publishable key in the two marked lines.","err");
+}
+
+function setAuth(t,c="muted"){const e=document.getElementById("authStatus");e.textContent=t;e.className="status "+c}
+function toggleAuth(){
+  loginMode=!loginMode;
+  document.getElementById("authTitle").textContent=loginMode?"Login":"Create account";
+  document.getElementById("authBtn").textContent=loginMode?"Login":"Sign up";
+  document.getElementById("switchBtn").textContent=loginMode?"Need an account? Sign up":"Already have an account? Login";
+}
+async function auth(){
+  if(!sb){setAuth("Add Supabase credentials first.","err");return}
+  const email=document.getElementById("email").value.trim(),password=document.getElementById("password").value;
+  if(!email||password.length<6){setAuth("Enter email and password (6+ characters).","err");return}
+  setAuth("Please wait...");
+  const r=loginMode?await sb.auth.signInWithPassword({email,password}):await sb.auth.signUp({email,password});
+  if(r.error){setAuth(r.error.message,"err");return}
+  if(!loginMode&&!r.data.session){setAuth("Account created. Check your email if confirmation is enabled.","ok")}
+}
+async function logout(){if(sb)await sb.auth.signOut()}
+function showAuth(){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById("auth").classList.add("active");document.getElementById("nav").style.display="none"}
+function enterApp(){
+ document.getElementById("nav").style.display="grid";
+ document.getElementById("userEmail").textContent=currentUser.email;
+ document.getElementById("welcome").textContent="Welcome, "+(currentUser.email.split("@")[0])+"!";
+ show("home",document.querySelector(".nav button"));
+ loadMessages();
+}
+function show(id,el){
+ document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ if(el){document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));el.classList.add("active")}
+ window.scrollTo(0,0);
+ if(id==="chat")loadMessages();
+}
+async function sendMessage(){
+ if(!sb||!currentUser)return;
+ const input=document.getElementById("message"),text=input.value.trim();if(!text)return;
+ const {error}=await sb.from("messages").insert({user_id:currentUser.id,message:text});
+ if(error){alert("Chat table setup required. See the SQL below.");return}
+ input.value="";
+}
+async function loadMessages(){
+ if(!sb||!currentUser)return;
+ const {data,error}=await sb.from("messages").select("*").order("created_at",{ascending:true}).limit(100);
+ if(error)return;
+ const box=document.getElementById("chatbox");box.innerHTML="";
+ data.forEach(addMessage);
+ box.scrollTop=box.scrollHeight;
+ sb.channel("messages-live").on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},p=>{
+   if(!document.querySelector(`[data-id="${p.new.id}"]`))addMessage(p.new);
+ }).subscribe();
+}
+function addMessage(m){
+ const box=document.getElementById("chatbox"),d=document.createElement("div");
+ d.className="msg "+(m.user_id===currentUser?.id?"mine":"");d.dataset.id=m.id;
+ d.textContent=m.message;box.appendChild(d);box.scrollTop=box.scrollHeight;
+}
+function join(name){alert("Joined "+name+" — group database can be added next.")}
+const truths=["What skill would you love to learn?","What is your dream travel destination?","What is one hobby you want to try?","What always makes you laugh?"];
+const dares=["Send a funny emoji-only message to a friend.","Do a superhero pose for 10 seconds.","Make up a silly nickname for yourself.","Say three kind things about a friend."];
+const wers=["Would you rather explore space or the deep ocean?","Would you rather be great at art or music?","Would you rather have unlimited games or movies?"];
+function pick(a){const q=a[Math.floor(Math.random()*a.length)];document.getElementById("question").textContent=q;document.getElementById("tdq").textContent=q}
+function truth(){pick(truths)}function dare(){pick(dares)}function wyr(){pick(wers)}
+function quiz(){document.getElementById("question").textContent="Which planet is known as the Red Planet?  A) Venus  B) Mars  C) Jupiter"}
+</script>
+</body>
+</html>
