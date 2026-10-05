@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VYBLI — Connect • Play • Discover</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,Arial,sans-serif;background:#08090d;color:#fff;min-height:100vh}
+.app{max-width:520px;margin:auto;min-height:100vh;background:linear-gradient(180deg,#11131c,#08090d)}
+header{padding:22px 18px 14px;position:sticky;top:0;background:rgba(10,11,16,.88);backdrop-filter:blur(16px);z-index:5}
+.brand{font-size:27px;font-weight:900;letter-spacing:-1px}
+.brand span{color:#8b5cf6}.sub{color:#8f94a5;font-size:12px;margin-top:3px}
+.screen{display:none;padding:16px 16px 105px}.screen.active{display:block}
+.hero{padding:18px;border:1px solid #272a38;border-radius:24px;background:radial-gradient(circle at top right,#30205e,#141620 55%,#101116)}
+.hero h1{font-size:30px;line-height:1.05;margin-bottom:9px}.hero p{color:#b5b8c5;font-size:13px}
+.btn{border:0;border-radius:14px;padding:12px 15px;font-weight:800;cursor:pointer;background:#8b5cf6;color:#fff;margin-top:14px}
+.cards{display:grid;gap:12px;margin-top:15px}
+.card{padding:16px;border:1px solid #282b38;background:#151720;border-radius:19px}
+.card h3{margin-bottom:6px}.muted{color:#9297a8;font-size:13px}
+.row{display:flex;align-items:center;gap:11px}.avatar{width:45px;height:45px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#8b5cf6,#ec4899);font-weight:900}
+.chips{display:flex;gap:8px;overflow:auto;margin:15px 0}.chip{white-space:nowrap;background:#1b1d28;border:1px solid #2b2e3a;padding:9px 12px;border-radius:99px;font-size:12px}
+.chat{height:330px;overflow:auto;padding:12px;background:#0d0f15;border-radius:16px;margin-top:12px}
+.msg{max-width:78%;padding:10px 12px;border-radius:15px;margin:8px 0;background:#20232f;font-size:13px}.me{margin-left:auto;background:#7044d8}
+.input{display:flex;gap:8px;margin-top:10px}.input input{flex:1;background:#181a23;border:1px solid #2b2e3a;color:white;border-radius:13px;padding:12px;outline:none}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);display:grid;grid-template-columns:repeat(5,1fr);padding:10px 7px calc(10px + env(safe-area-inset-bottom));background:rgba(12,13,18,.94);backdrop-filter:blur(18px);border-top:1px solid #252733;z-index:10}
+.nav button{background:none;border:0;color:#777c8d;font-size:11px;padding:7px 2px}.nav button.active{color:#fff}.ico{display:block;font-size:20px;margin-bottom:3px}
+.gamegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.game{min-height:120px;border-radius:20px;padding:16px;background:linear-gradient(145deg,#25283a,#151722);border:1px solid #303342}
+.game b{display:block;font-size:17px;margin-bottom:7px}
+.truth{margin-top:12px;text-align:center;padding:25px 15px;border:1px solid #2a2d3b;border-radius:22px;background:#141620}
+.question{font-size:21px;font-weight:800;min-height:80px;display:grid;place-items:center}
+.actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.actions .btn{margin-top:8px}
+.list{margin-top:12px}.item{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid #252733}
+.badge{font-size:10px;background:#242735;padding:5px 8px;border-radius:99px;color:#b9bdd0}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="brand">VYB<span>LI</span> ✦</div><div class="sub">Connect • Play • Discover</div></header>
+
+<section id="home" class="screen active">
+<div class="hero"><h1>Your people.<br>Your vibe.</h1><p>A playful social space for chats, communities, games and daily questions.</p><button class="btn" onclick="toast('Welcome to VYBLI!')">Explore VYBLI →</button></div>
+<div class="chips"><div class="chip">🔥 Trending</div><div class="chip">🎮 Games</div><div class="chip">💬 Chats</div><div class="chip">✨ New</div></div>
+<div class="cards">
+<div class="card row"><div class="avatar">A</div><div><h3>Anime Squad</h3><p class="muted">2.8K people • Active now</p></div></div>
+<div class="card row"><div class="avatar">M</div><div><h3>Meme Factory</h3><p class="muted">1.4K people • 128 online</p></div></div>
+<div class="card row"><div class="avatar">🎮</div><div><h3>Night Gamers</h3><p class="muted">890 people • 76 online</p></div></div>
+</div></section>
+
+<section id="chat" class="screen">
+<h2>💬 Chats</h2><p class="muted">One-to-one conversations</p>
+<div class="chat" id="chatbox"><div class="msg">Hey! Welcome to VYBLI 👋</div><div class="msg me">Yo! What's up?</div><div class="msg">Ready to play something? 🎮</div></div>
+<div class="input"><input id="chatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMsg()"><button class="btn" style="margin:0" onclick="sendMsg()">Send</button></div>
+</section>
+
+<section id="group" class="screen">
+<h2>👥 Communities</h2><p class="muted">Telegram-style groups, but with a VYBLI vibe.</p>
+<div class="cards">
+<div class="card"><h3>🔥 Daily Vibes</h3><p class="muted">12.4K members • announcements, memes & chat</p><button class="btn" onclick="toast('Joined Daily Vibes')">Join group</button></div>
+<div class="card"><h3>🎬 Anime Hub</h3><p class="muted">8.7K members • edits, theories & watch nights</p><button class="btn" onclick="toast('Joined Anime Hub')">Join group</button></div>
+<div class="card"><h3>⚡ Gaming Zone</h3><p class="muted">5.2K members • matches & challenges</p><button class="btn" onclick="toast('Joined Gaming Zone')">Join group</button></div>
+</div></section>
+
+<section id="game" class="screen">
+<h2>🎮 Play Zone</h2><p class="muted">Quick games to play with friends.</p>
+<div class="gamegrid">
+<div class="game"><b>❓ Truth or Dare</b><span class="muted">Random challenges</span><br><button class="btn" onclick="truthDare()">Play</button></div>
+<div class="game"><b>🎯 Would You Rather</b><span class="muted">Pick your side</span><br><button class="btn" onclick="wyr()">Play</button></div>
+<div class="game"><b>🧠 Quick Quiz</b><span class="muted">Beat your score</span><br><button class="btn" onclick="toast('Quiz mode coming next!')">Play</button></div>
+<div class="game"><b>⚔️ 1v1 Battle</b><span class="muted">Challenge a friend</span><br><button class="btn" onclick="toast('Invite a friend to battle!')">Play</button></div>
+</div>
+<div class="truth"><div id="question" class="question">Choose a game above</div><div class="actions"><button class="btn" onclick="truthDare()">Truth</button><button class="btn" onclick="dare()">Dare</button><button class="btn" onclick="wyr()">Would You Rather</button></div></div>
+</section>
+
+<section id="profile" class="screen">
+<h2>✨ Profile</h2>
+<div class="card" style="margin-top:14px;text-align:center"><div class="avatar" style="margin:auto;width:70px;height:70px;font-size:25px">V</div><h2 style="margin-top:10px">VYB Creator</h2><p class="muted">@vibe_player • Level 12</p><button class="btn" onclick="toast('Profile editor opened')">Edit profile</button></div>
+<div class="list">
+<div class="item"><span>🔥 Streak</span><b>7 days</b></div><div class="item"><span>🎮 Games played</span><b>42</b></div><div class="item"><span>👥 Groups joined</span><b>9</b></div><div class="item"><span>🏆 Points</span><b>2,480</b></div>
+</div></section>
+
+<nav class="nav">
+<button class="active" onclick="show('home',this)"><span class="ico">⌂</span>Home</button>
+<button onclick="show('chat',this)"><span class="ico">◉</span>Chat</button>
+<button onclick="show('group',this)"><span class="ico">♟</span>Groups</button>
+<button onclick="show('game',this)"><span class="ico">🎮</span>Play</button>
+<button onclick="show('profile',this)"><span class="ico">◯</span>Profile</button>
+</nav>
+</div>
+<script>
+function show(id,el){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));el.classList.add('active');window.scrollTo(0,0)}
+function toast(t){alert(t)}
+function sendMsg(){let i=document.getElementById('chatInput'),v=i.value.trim();if(!v)return;let b=document.getElementById('chatbox');b.innerHTML+=`<div class="msg me">${escapeHtml(v)}</div>`;i.value='';b.scrollTop=b.scrollHeight;setTimeout(()=>{b.innerHTML+=`<div class="msg">Nice! VYBLI is ready for more features 😎</div>`;b.scrollTop=b.scrollHeight},500)}
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+const truths=['What is one thing you want to learn this year?','What is your funniest harmless habit?','What is a skill you wish you had?','What is your dream place to visit?'];
+const dares=['Send a funny emoji-only message to a friend.','Do your best superhero pose for 10 seconds.','Make up a silly nickname for yourself.','Say three nice things about your friend.'];
+const wers=['Would you rather have unlimited games or unlimited movies?','Would you rather explore space or the deep ocean?','Would you rather be great at art or music?'];
+function pick(a){document.getElementById('question').textContent=a[Math.floor(Math.random()*a.length)]}
+function truthDare(){pick(truths)} function dare(){pick(dares)} function wyr(){pick(wers)}
+</script>
+</body></html>
